@@ -219,8 +219,6 @@ ___
 
 ![alt text](blue-exp.png)
 
-To stop executing the commands in the queue, you have to call ```dType.SetQueuedCmdStopExec()```. This will stop quering the Dobot, but if a command is currently running when the function is called, the command will finish its execution. The function *dType.SetQueuedCmdForceStopExec()* however, will force the command being executed to be forced to stop.
-
 Pada frame diatas kita dapat melihat objek warna biru yang terdeteksi dan titik koordinatnya berdasarkan koordinat layar. Untuk mengakhiri frame, tekan tombol 'q'.
 
 **Syntax**: 
