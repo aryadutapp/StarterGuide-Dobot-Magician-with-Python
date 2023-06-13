@@ -23,7 +23,7 @@ Dalam hal ini memfokuskan pengoperasian DoBot Magician melalui Python dengan  me
 ## Memulai
 
 Untuk berkomunikasi dengan robot, kita memerlukan aplikasi [Dobot Lab](https://www.dobot-robots.com/products/education/magician.html). Selanjutnya pastikan kita juga menginstal 
-[Python](https://www.python.org/) dan OpenCV dalam lingkungan Python [OpenCV](https://opencv.org/). Untuk IDE, kita dapat memanfaatkan menu Python Lab dalam aplikasi Dobot LAb.
+[Python](https://www.python.org/) dan [OpenCV](https://opencv.org/) dalam lingkungan Python. Untuk IDE, kita dapat memanfaatkan menu Python Lab dalam aplikasi Dobot LAb.
 
 
 
