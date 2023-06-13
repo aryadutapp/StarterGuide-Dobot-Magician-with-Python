@@ -9,7 +9,7 @@ Dalam hal ini memfokuskan pengoperasian DoBot Magician melalui Python dengan  me
 
 ## Daftar Isi
 * [Memulai](#memulai)
-* [Langkah - Langkah](#langkah langkah)
+* [Panduan](#panduan)
    * [Pengaturan Kamera](#Pengaturan Kamera)
    * [Deteksi Objek dengan OpenCV](#Deteksi Objek dengan OpenCV)
    * [Menghubungkan Robot](#Menghubungkan Robot)
@@ -27,7 +27,7 @@ To communicate with the DoBot we need to download the API supplied by DOBOT for 
 
 You will also need [Python](https://www.python.org/). Python is also available for download through the Microsoft Store.
 
-## Langkah  Langkah
+## Panduan
 
 To understand how to use the Dobot more efficiently we have to look into what types of commands you can use to control it. Many of these functions are accessable inside the DoBotControl file, but theres also alot of them inside the DLL file  which is not being used. Here we will briefly go through some of the most important ones to get you started. If you want more indepth information it can be found in the [DoBot Magician API Description](https://www.dobot.cc/downloadcenter.html?sub_cat=72#sub-download).
 
