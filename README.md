@@ -8,8 +8,8 @@
 Dalam hal ini memfokuskan pengoperasian DoBot Magician melalui Python dengan  menggunakan [Dobot Lab](https://www.dobot-robots.com/products/education/magician.html). Menggunakan kode Python memberikan kebebasan yang lebih besar dalam mengontrol DoBot Magician, termasuk otomatisasi dan gerakan yang sangat terkalibrasi untuk tugas yang kompleks. 
 
 ## Daftar Isi
-* [Memulai](#Memulai)
-* [Langkah - Langkah](#Langkah-Langkah)
+* [Memulai](#memulai)
+* [Langkah - Langkah](#langkah-langkah)
    * [Pengaturan Kamera](#Pengaturan Kamera)
    * [Deteksi Objek dengan OpenCV](#Deteksi Objek dengan OpenCV)
    * [Menghubungkan Robot](#Menghubungkan Robot)
