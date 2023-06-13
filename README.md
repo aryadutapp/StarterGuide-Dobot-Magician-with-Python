@@ -31,13 +31,188 @@ Untuk berkomunikasi dengan robot, kita memerlukan aplikasi [Dobot Lab](https://w
 Untuk memahami bagaimana alur kerja pick-and-place mari kita bagi menjadi tiga kategori berupa persepsi, kognisi, dan aksi. Persepsi merupakan bagaimana robot dapat melihat lingkungan sekitar. Secara default, Dobot Magician tidak memiliki sensor yang mengawasi kondisi eksternal robot. Oleh sebab itu, kita akan menggunakan kamera sebagai masukan citra yang terhubung ke komputer. Kognisi adalah bagaimana robot dapat memahami lingkungan sekitar. Kita melakukan pengolahan citra dengan menggunakan OpenCV dengan Python yang dapat melakukan berbagai operasi pengolahan citra, dalam projek ini berarti bagaimana objek dapat dideteksi berdasarkan klasifikasi warna. Aksi adalah pergerakan yang dilakukan robot setelah memahami lingkungan sekitar, dalam projek ini berarti bagaimana robot dapat bergerak dan mengambil objek.
 
 ### Deteksi Objek dengan OpenCV
-There are functions which manipulates the command queue and functions that issue commands to the Dobot. You can operate the Dobot using the command queue, or just issue them directly. The difference is that the command queue can be filled up with commands and then executed in order, while without it the command will be executed directly after being called. To start off we will go through the mcommand queue manipulation functions.
 
-The function ```dType.SetQueuedCmdStartExec()``` will start executing the commands in the queue one after another in order of inputting them. If no commands are in the queue, nothing will happen.
+OpenCV berisi metode yang dapat menerima berkas konfigurasi/bobot deteksi objek untuk berbagai model deteksi objek yang berbeda. OpenCV dapat menghasilkan ambang batas kepercayaan (confidence threshold) dan koordinat kotak pembatas (bounding box). Hal ini sangat berguna karena OpenCV memiliki metode yang dapat menerima koordinat kotak pembatas untuk dengan cepat menampilkan kotak di sekitar objek yang terdeteksi dan memberi label pada objek yang terdeteksi dengan sedikit kode yang sederhana dan bersih.
 
 **Syntax**: 
 ```python
-dType.SetQueuedCmdStartExec()
+import numpy as np
+import cv2
+
+# Global variables to store the mouse coordinates and ignore flag
+mouse_x = 0
+mouse_y = 0
+ignore_color_detection = False
+
+# Global variables to store the object coordinates (blue,red,yellow)
+xblu = 0
+yblu = 0
+xred = 0
+yred = 0
+xyel = 0
+yyel = 0
+
+
+# Function to handle mouse events
+def mouse_callback(event, x, y, flags, param):
+    global mouse_x, mouse_y, ignore_color_detection
+
+    if event == cv2.EVENT_LBUTTONDOWN:
+        # Store the mouse coordinates when left button is clicked
+        mouse_x = x
+        mouse_y = y
+        ignore_color_detection = not ignore_color_detection  # Toggle the ignore flag
+
+# Capturing video through webcam
+webcam = cv2.VideoCapture("http://10.3.130.130:4747/video")
+
+# Initialize last known mouse coordinates
+last_mouse_x = 0
+last_mouse_y = 0
+
+# Start a while loop
+while True:
+    # Reading the video from the webcam in image frames
+    _, imageFrame = webcam.read()
+
+    # Using cv2.rectangle() method
+    # Draw a rectangle of black color of thickness -1 px
+    imageFrame = cv2.rectangle(imageFrame, (425, 0), (640, 480), (0, 0, 0), -1)
+
+    # Convert the imageFrame to HSV color space
+    hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
+
+    # Set range for red color and define mask
+    red_lower = np.array([136, 87, 111], np.uint8)
+    red_upper = np.array([180, 255, 255], np.uint8)
+    red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
+
+    # Set range for yellow color and define mask
+    yellow_lower = np.array([22, 93, 0], np.uint8)
+    yellow_upper = np.array([45, 255, 255], np.uint8)
+    yellow_mask = cv2.inRange(hsvFrame, yellow_lower, yellow_upper)
+
+    # Set range for blue color and define mask
+    blue_lower = np.array([80, 140, 110], np.uint8)
+    blue_upper = np.array([120, 255, 255], np.uint8)
+    blue_mask = cv2.inRange(hsvFrame, blue_lower, blue_upper)
+
+    # Morphological Transform, Dilation for each color
+    kernel = np.ones((5, 5), "uint8")
+
+    # For red color
+    red_mask = cv2.dilate(red_mask, kernel)
+    contours, _ = cv2.findContours(red_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    red_count = 0  # Variable to store red object count
+
+    for pic, contour in enumerate(contours):
+        area = cv2.contourArea(contour)
+        if area > 300:
+            x, y, w, h = cv2.boundingRect(contour)
+            has_inner_object = False
+            for inner_contour in contours:
+                if inner_contour is not contour:
+                    inner_area = cv2.contourArea(inner_contour)
+                    inner_x, inner_y, inner_w, inner_h = cv2.boundingRect(inner_contour)
+                    if (
+                        inner_x > x
+                        and inner_y > y
+                        and inner_x + inner_w < x + w
+                        and inner_y + inner_h < y + h
+                        and inner_area < area
+                    ):
+                        has_inner_object = True
+                        break
+            if not has_inner_object:
+                center = (x + w // 2, y + h // 2)
+                xred = x + w // 2
+                yred = y + h // 2
+                cv2.circle(imageFrame, center, 5, (0, 0, 255), -1)
+                red_count += 1
+                # Print coordinates on the right side of the frame
+                cv2.putText(imageFrame, f"Red {red_count}: {center}", (450, 10 + red_count * 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2, cv2.LINE_AA)
+
+    # For yellow color
+    yellow_mask = cv2.dilate(yellow_mask, kernel)
+    contours, _ = cv2.findContours(yellow_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    yellow_count = 0  # Variable to store yellow object count
+
+    for pic, contour in enumerate(contours):
+        area = cv2.contourArea(contour)
+        if area > 300:
+            x, y, w, h = cv2.boundingRect(contour)
+            has_inner_object = False
+            for inner_contour in contours:
+                if inner_contour is not contour:
+                    inner_area = cv2.contourArea(inner_contour)
+                    inner_x, inner_y, inner_w, inner_h = cv2.boundingRect(inner_contour)
+                    if (
+                        inner_x > x
+                        and inner_y > y
+                        and inner_x + inner_w < x + w
+                        and inner_y + inner_h < y + h
+                        and inner_area < area
+                    ):
+                        has_inner_object = True
+                        break
+            if not has_inner_object:
+                center = (x + w // 2, y + h // 2)
+                xyel = x + w // 2
+                yyel = y + h // 2
+                cv2.circle(imageFrame, center, 5, (0, 165, 255), -1)
+                yellow_count += 1
+                # Print coordinates on the right side of the frame
+                cv2.putText(imageFrame, f"Yellow {yellow_count}: {center}", (450, 150 + yellow_count * 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 165, 255), 2, cv2.LINE_AA)
+
+    # For blue color
+    blue_mask = cv2.dilate(blue_mask, kernel)
+    contours, _ = cv2.findContours(blue_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    blue_count = 0  # Variable to store blue object count
+
+    for pic, contour in enumerate(contours):
+        area = cv2.contourArea(contour)
+        if area > 300:
+            x, y, w, h = cv2.boundingRect(contour)
+            has_inner_object = False
+            for inner_contour in contours:
+                if inner_contour is not contour:
+                    inner_area = cv2.contourArea(inner_contour)
+                    inner_x, inner_y, inner_w, inner_h = cv2.boundingRect(inner_contour)
+                    if (
+                        inner_x > x
+                        and inner_y > y
+                        and inner_x + inner_w < x + w
+                        and inner_y + inner_h < y + h
+                        and inner_area < area
+                    ):
+                        has_inner_object = True
+                        break
+            if not has_inner_object:
+                center = (x + w // 2, y + h // 2)
+                xblu = x + w // 2
+                yblu = y + h // 2
+                cv2.circle(imageFrame, center, 5, (255, 0, 0), -1)
+                blue_count += 1
+                # Print coordinates on the right side of the frame
+                cv2.putText(imageFrame, f"Blue {blue_count}: {center}", (450, 300 + blue_count * 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2, cv2.LINE_AA)
+
+    # Set the last known mouse coordinates
+    last_mouse_x = mouse_x
+    last_mouse_y = mouse_y
+
+    # Show the frame
+    cv2.imshow("Color Detection", imageFrame)
+
+    # Check if 'q' is pressed on the keyboard
+    if cv2.waitKey(1) & 0xFF == ord("q"):
+        break
+
+# Release the webcam and close all windows
+webcam.release()
+cv2.destroyAllWindows()
 ```
 
 ___
