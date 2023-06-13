@@ -21,11 +21,11 @@ Dalam hal ini memfokuskan pengoperasian DoBot Magician melalui Python dengan  me
 
 
 ## Memulai
-To get started you'll need an IDE which you can use to work with Python. There is no need to use a specific one so go with the IDE that you are the most comfortable with and has support for Python. For the functions created in this guide [Atom](https://atom.io/) was used, but it is not necessary as an IDE like [Visual Studio Code](https://code.visualstudio.com/) or similar would also suffice.
 
-To communicate with the DoBot we need to download the API supplied by DOBOT for the DoBot Magician. The file you are looking for is [DobotDemov2.0](https://www.dobot.cc/downloadcenter/dobot-magician.html?sub_cat=72#sub-download). From this website you're also required to download and install the [Magician Studio](https://www.dobot.cc/downloadcenter/dobot-magician.html). We will not use the application itself, but the installation process contains some dependencies required to communicate with the dobot from our third party application.
+Untuk berkomunikasi dengan robot, kita memerlukan aplikasi [Dobot Lab](https://www.dobot-robots.com/products/education/magician.html). Selanjutnya pastikan kita juga menginstal 
+[Python](https://www.python.org/) dan OpenCV dalam lingkungan Python [OpenCV](https://opencv.org/). Untuk IDE, kita dapat memanfaatkan menu Python Lab dalam aplikasi Dobot LAb.
 
-You will also need [Python](https://www.python.org/). Python is also available for download through the Microsoft Store.
+
 
 ## Panduan
 
