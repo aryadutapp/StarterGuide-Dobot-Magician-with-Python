@@ -15,9 +15,8 @@ Dalam hal ini memfokuskan pengoperasian DoBot Magician melalui Python dengan  me
    * [Menghubungkan Robot](#Menghubungkan-Robot)
    * [Kalibrasi Robot dengan Kamera](#Kalibrasi-Robot-dengan-Kamera)
    * [Pick and Place](#Pick-and-Place)
-* [Test Program](#test-program)
-* [Conclusion](#conclusion)
-* [Download Links](#download-links)
+* [Kode Akhir](#Kode-Akhir)
+
 
 
 ## Memulai
@@ -247,101 +246,256 @@ Selain itu, Dobot Magician mempunyai fungsi bawaan yang dapat mengaktifkan edn e
 magician.set_endeffector_suctioncup(enable=True, on=True)
 ```
 
-
-
-The enableControl argument enables or disables the pump. Suction enables outtake or intake. For more peripheral information, refer to the documentation.
-
-
-There file named **DobotArm.py** contains wrapper functions which can be used as an example when making your own program.
-
-## Test Program
-After extracting the contents of the DobotDemoV2.0 folder we find a list of more folders. These are demos for the available languages which can be used to operate the Dobot. The one we are going to use in this guide is the DobotDemoForPython. In this folder we can find a file called **DobotControl.py**. This file contains a test program which uses a connection to the Dobot through USB which makes it do a couple of gestures. If you have installed Python and Magician Studio correctly you should be able to run the file without any problems, as long as you are connected to the Dobot through any of your USB ports. 
-
-There is also an example program available for download on this github. This program includes some example functions for the API , this is not necessarily the only way to structure the program and the one you make will most probably not look similar to this one. Nevertheless, let's look into the functions.
-
-The program starts with the creation of the object which we use to communicate with the Dobot. In the case of the example program the object is called ctrlBot and is of the type DobotArm. The constructor of the object takes in home coordinates for the Dobot. The constructor also calls the dobotConnect() function which connects to the Dobot and sets its various parameters.
-
-*In many of the functions we can find the self object being passed around. In python this is used to refer to the object calling the function to be able to access the information specific to that object.*
+## Kode Akhir
 
 **Syntax**:
 ```python
-dobotConnect(self)
+# version: Python3
+from DobotEDU import *
+
+import numpy as np
+import cv2
+
+# Global variables to store the mouse coordinates and ignore flag
+mouse_x = 0
+mouse_y = 0
+ignore_color_detection = False
+
+# Global variables to store the mouse coordinates and ignore flag
+xblu = 0
+yblu = 0
+
+xred = 0
+yred = 0
+
+xyel = 0
+yyel = 0
+
+
+# Function to handle mouse events
+def mouse_callback(event, x, y, flags, param):
+    global mouse_x, mouse_y, ignore_color_detection
+
+    if event == cv2.EVENT_LBUTTONDOWN:
+        # Store the mouse coordinates when left button is clicked
+        mouse_x = x
+        mouse_y = y
+        ignore_color_detection = not ignore_color_detection  # Toggle the ignore flag
+
+# Capturing video through webcam
+webcam = cv2.VideoCapture("http://10.3.130.130:4747/video")
+
+# Initialize last known mouse coordinates
+last_mouse_x = 0
+last_mouse_y = 0
+
+# Start a while loop
+while True:
+    # Reading the video from the webcam in image frames
+    _, imageFrame = webcam.read()
+
+    # Using cv2.rectangle() method
+    # Draw a rectangle of black color of thickness -1 px
+    imageFrame = cv2.rectangle(imageFrame, (425, 0), (640, 480), (0, 0, 0), -1)
+
+    # Convert the imageFrame to HSV color space
+    hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
+
+    # Set range for red color and define mask
+    red_lower = np.array([136, 87, 111], np.uint8)
+    red_upper = np.array([180, 255, 255], np.uint8)
+    red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
+
+    # Set range for yellow color and define mask
+    yellow_lower = np.array([22, 93, 0], np.uint8)
+    yellow_upper = np.array([45, 255, 255], np.uint8)
+    yellow_mask = cv2.inRange(hsvFrame, yellow_lower, yellow_upper)
+
+    # Set range for blue color and define mask
+    blue_lower = np.array([80, 140, 110], np.uint8)
+    blue_upper = np.array([120, 255, 255], np.uint8)
+    blue_mask = cv2.inRange(hsvFrame, blue_lower, blue_upper)
+
+    # Morphological Transform, Dilation for each color
+    kernel = np.ones((5, 5), "uint8")
+
+    # For red color
+    red_mask = cv2.dilate(red_mask, kernel)
+    contours, _ = cv2.findContours(red_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    red_count = 0  # Variable to store red object count
+
+    for pic, contour in enumerate(contours):
+        area = cv2.contourArea(contour)
+        if area > 300:
+            x, y, w, h = cv2.boundingRect(contour)
+            has_inner_object = False
+            for inner_contour in contours:
+                if inner_contour is not contour:
+                    inner_area = cv2.contourArea(inner_contour)
+                    inner_x, inner_y, inner_w, inner_h = cv2.boundingRect(inner_contour)
+                    if (
+                        inner_x > x
+                        and inner_y > y
+                        and inner_x + inner_w < x + w
+                        and inner_y + inner_h < y + h
+                        and inner_area < area
+                    ):
+                        has_inner_object = True
+                        break
+            if not has_inner_object:
+                center = (x + w // 2, y + h // 2)
+                xred = x + w // 2
+                yred = y + h // 2
+                cv2.circle(imageFrame, center, 5, (0, 0, 255), -1)
+                red_count += 1
+                # Print coordinates on the right side of the frame
+                cv2.putText(imageFrame, f"Red {red_count}: {center}", (450, 10 + red_count * 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2, cv2.LINE_AA)
+
+    # For yellow color
+    yellow_mask = cv2.dilate(yellow_mask, kernel)
+    contours, _ = cv2.findContours(yellow_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    yellow_count = 0  # Variable to store yellow object count
+
+    for pic, contour in enumerate(contours):
+        area = cv2.contourArea(contour)
+        if area > 300:
+            x, y, w, h = cv2.boundingRect(contour)
+            has_inner_object = False
+            for inner_contour in contours:
+                if inner_contour is not contour:
+                    inner_area = cv2.contourArea(inner_contour)
+                    inner_x, inner_y, inner_w, inner_h = cv2.boundingRect(inner_contour)
+                    if (
+                        inner_x > x
+                        and inner_y > y
+                        and inner_x + inner_w < x + w
+                        and inner_y + inner_h < y + h
+                        and inner_area < area
+                    ):
+                        has_inner_object = True
+                        break
+            if not has_inner_object:
+                center = (x + w // 2, y + h // 2)
+                xyel = x + w // 2
+                yyel = y + h // 2
+                cv2.circle(imageFrame, center, 5, (0, 165, 255), -1)
+                yellow_count += 1
+                # Print coordinates on the right side of the frame
+                cv2.putText(imageFrame, f"Yellow {yellow_count}: {center}", (450, 150 + yellow_count * 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 165, 255), 2, cv2.LINE_AA)
+
+    # For blue color
+    blue_mask = cv2.dilate(blue_mask, kernel)
+    contours, _ = cv2.findContours(blue_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    blue_count = 0  # Variable to store blue object count
+
+    for pic, contour in enumerate(contours):
+        area = cv2.contourArea(contour)
+        if area > 300:
+            x, y, w, h = cv2.boundingRect(contour)
+            has_inner_object = False
+            for inner_contour in contours:
+                if inner_contour is not contour:
+                    inner_area = cv2.contourArea(inner_contour)
+                    inner_x, inner_y, inner_w, inner_h = cv2.boundingRect(inner_contour)
+                    if (
+                        inner_x > x
+                        and inner_y > y
+                        and inner_x + inner_w < x + w
+                        and inner_y + inner_h < y + h
+                        and inner_area < area
+                    ):
+                        has_inner_object = True
+                        break
+            if not has_inner_object:
+                center = (x + w // 2, y + h // 2)
+                xblu = x + w // 2
+                yblu = y + h // 2
+                cv2.circle(imageFrame, center, 5, (255, 0, 0), -1)
+                blue_count += 1
+                # Print coordinates on the right side of the frame
+                cv2.putText(imageFrame, f"Blue {blue_count}: {center}", (450, 300 + blue_count * 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2, cv2.LINE_AA)
+
+    # Set the last known mouse coordinates
+    last_mouse_x = mouse_x
+    last_mouse_y = mouse_y
+
+    # Show the frame
+    cv2.imshow("Color Detection", imageFrame)
+
+    # Check if 'q' is pressed on the keyboard
+    if cv2.waitKey(1) & 0xFF == ord("q"):
+        break
+
+# Release the webcam and close all windows
+webcam.release()
+cv2.destroyAllWindows()
+
+endx = 2.187 * xblu - 133.34
+endy = -2.2508 * yblu + 523.72
+
+print(xblu)
+print(yblu)
+print(endx)
+print(endy)
+
+
+magician.ptp(mode=0, x=endx, y=endy, z=-67, r=0)
+magician.set_endeffector_suctioncup(enable=True, on=True)
+
+magician.ptp(mode=0, x=259.23, y=0, z=-8.49, r=0)
+magician.set_endeffector_suctioncup(enable=True, on=False)
+
+
+endx = 2.187 * xyel - 133.34
+endy = -2.2508 * yyel + 523.72
+
+print(xyel)
+print(yyel)
+print(endx)
+print(endy)
+
+
+magician.ptp(mode=0, x=endx, y=endy, z=-78, r=0)
+magician.set_endeffector_suctioncup(enable=True, on=True)
+
+magician.ptp(mode=0, x=259.23, y=0, z=-8.49, r=0)
+magician.set_endeffector_suctioncup(enable=True, on=False)
+
+endx = 2.187 * xred - 133.34
+endy = -2.2508 * yred + 523.72
+
+print(xyel)
+print(yyel)
+print(endx)
+print(endy)
+
+
+magician.ptp(mode=0, x=endx, y=endy, z=-75, r=0)
+magician.set_endeffector_suctioncup(enable=True, on=True)
+
+magician.ptp(mode=0, x=259.23, y=0, z=-8.49, r=0)
+magician.set_endeffector_suctioncup(enable=True, on=False)
 ```
 
 ___
-
-The function commandDelay() is called after each command is issued to the dobot. This is included so that the dobot is allowed to do its action before another command is issued.
-
-**Syntax**:
-```python
-commandDelay(self, lastIndex)
-```
-
-___
-
-toggleSuction() is an example function of how to initiate the peripheral connected to the dobot. In this example, we activate or deactivate the suction cup peripheral. It works much like a light switch, where the light is toggled on and off and keeps that state afterwards. This means that we only need to call the function to activate the peripheral, and then call it again once we're done with it.
-
-**Syntax**:
-```python
-toggleSuction(self)
-```
-
-___
-
-Main movement is done through the moveArmXY() function. The arguments for the function is the x and y positions which we want the dobot to travel to.
-
-**Syntax**:
-```python
-moveArmXY(self, x,y)
-```
-
-___
-
-As a utility a function that moves the arm to the selected home positions are also included.
-
-**Syntax**:
-```python
-moveHome(self)
-```
-
-___
-
-Last but not least, the function pickToggle() moves the arm up or down to the requested height. The only argument it takes is the height it moves too.
-
-**Syntax**:
-```python
-pickToggle(self, itemHeight)
-```
-
-___
-
-These functions will allow to do simple automation for the dobot by combining them, like in the manualmode function inside the **main.py** file. It allows for simple x,y grid movements and picking of items. 
-
-
 
 ### Conclusion
-The capability of the Dobot Magician lays in your hands and what you can imagine. Automation, sorting, 3D printing and so on, it is a very fun machine to play with. I hope that this guide has helped you on your way to understanding how it works and to kick start you to start making the Dobot do whatever you want it to do. 
+Proyek "Pick and Place" dengan Dobot Magician dan kamera eksternal menggunakan OpenCV sebagai sistem persepsi adalah solusi yang efektif untuk otomatisasi tugas pengambilan dan penempatan objek. Integrasi antara Dobot Magician dan kamera memungkinkan pendeteksian objek secara visual dan kontrol gerakan robot berdasarkan informasi visual tersebut.
+
+Dalam proyek ini, OpenCV digunakan untuk memproses gambar dari kamera, termasuk konversi warna, segmentasi objek, dan analisis citra. Informasi visual seperti koordinat objek digunakan untuk mengarahkan gerakan Dobot Magician agar dapat mengambil dan menempatkan objek dengan akurasi tinggi.
+
+Keuntungan utama sistem ini adalah fleksibilitasnya. Dengan pengolahan citra yang kuat, sistem dapat beradaptasi dengan berbagai jenis objek dan lingkungan visual. Hal ini membuatnya berguna dalam berbagai industri seperti produksi, logistik, dan otomatisasi proses.
+
+Namun, keberhasilan proyek ini sangat bergantung pada kalibrasi yang akurat antara koordinat kamera dan koordinat robot. Kalibrasi yang tepat memastikan informasi visual dari kamera sesuai dengan pergerakan robot, sehingga objek dapat diambil dan ditempatkan dengan presisi tinggi.
+
+Secara keseluruhan, proyek "Pick and Place" dengan Dobot Magician dan kamera eksternal menggunakan OpenCV sebagai sistem persepsi adalah solusi yang efisien untuk mengotomatiskan tugas pengambilan dan penempatan objek. Integrasi teknologi robotika dan pengolahan citra memberikan keunggulan dalam presisi dan fleksibilitas. Dengan kalibrasi yang akurat, sistem ini dapat digunakan dalam berbagai aplikasi industri yang membutuhkan manipulasi objek dengan tingkat presisi yang tinggi.
 
 
-## Download Links
-[Atom](https://atom.io/) - IDE referensed above.
+*Dibuat oleh Kelompok 1 untuk Mata Kuliah Persepsi Robotika*
 
-[VS-Code](https://code.visualstudio.com/) - Alternative IDE
+*Teknik Komputer ITS*
 
-[Magician Studio](https://www.dobot.cc/downloadcenter/dobot-magician.html) - Dobot Application and Driver
-
-[DobotDemoV2.0](https://www.dobot.cc/downloadcenter/dobot-magician.html?sub_cat=72#sub-download) - Code Examples
-
-[Dobot API Manual](https://www.dobot.cc/downloadcenter/dobot-magician.html?sub_cat=72#sub-download) - Manual for API 
-
-[Python](https://www.python.org/) - Language used in this guide
-
-*Python installation instructions are available at their website. Other languages are also available but won't be present in this guide. The choice of IDE is completely in your hands.*
-
-___
-
-*Created by Hugo Nolte for Course PA1414 - Software Engineering Project*
-
-*BTH - Blekinge Institute of Technology*
-
-*2019*
+*2023*
