@@ -31,6 +31,8 @@ Untuk berkomunikasi dengan robot, kita memerlukan aplikasi [Dobot Lab](https://w
 
 ## Panduan
 
+Untuk memahami bagaimana alur kerja pick-and-place mari kita bagi menjadi tiga kategori berupa persepsi, kognisi, dan aksi. Persepsi merupakan bagaimana robot dapat melihat lingkungan sekitar. Secara default, Dobot Magician tidak memiliki sensor yang mengawasi kondisi eksternal robot. Oleh sebab itu, kita akan menggunakan kamera sebagai masukan citra yang terhubung ke komputer. Kognisi adalah abagaimana robot dapat memahami lingkungan sekitar. Kita melakukan pengolahan citra dengan menggunakan OpenCV dengan Python yang dapat melakukan berbagai operasi pengolahan citra, dalam projek ini berarti bagaimana objek dapat dideteksi berdasarkan klasifikasi warna. Aksi adalah pergerakan yang dilakukan robot setelah memahami lingkungan sekitar, dalam projek ini berarti bagaimana robot dapat bergerak dan mengambil objek.
+
 To understand how to use the Dobot more efficiently we have to look into what types of commands you can use to control it. Many of these functions are accessable inside the DoBotControl file, but theres also alot of them inside the DLL file  which is not being used. Here we will briefly go through some of the most important ones to get you started. If you want more indepth information it can be found in the [DoBot Magician API Description](https://www.dobot.cc/downloadcenter.html?sub_cat=72#sub-download).
 
 We will import the DobotDLLType file in python with the local name dType, as they have done in the DobotControl file. All of the DLL functions will be accessed with the help of this module name. The reason this local name is used to access the functions is to keep the guide in line with the DobotControl file to make it easier to understand.
