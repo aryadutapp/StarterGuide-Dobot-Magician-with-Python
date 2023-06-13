@@ -221,110 +221,23 @@ ___
 
 Pada frame diatas kita dapat melihat objek warna biru yang terdeteksi dan titik koordinatnya berdasarkan koordinat layar. Untuk mengakhiri frame, tekan tombol 'q'.
 
-**Syntax**: 
-```python
-dType.SetQueuedCmdStopExec()
-```
-```python
-dType.SetQueuedCmdForceStopExec()
-```
-
-___
-
-The command queue can also be cleared using the function *dType.SetQueuedCmdClear()*.
-
-**Syntax**: 
-```python
-dType.SetQueuedCmdClear(api)
-```
-
-___
-
-More queue manipulation functions are available in the documentation.
-
-
 ### Menghubungkan Robot
-Before we start issuing movement commands we need to set some parameters which specifies the velocity and acceleration of the joints. This is done using the function ```dType.SetPTPCommonParams()```. The function takes some arguments to specify the above. The first argument is the *api* object created with the load function. The second specifies the velocity ratio. The third specifies the acceleration ratio, and the last argument specifies if the function should be queued or not.
+Untuk menghubungkan Dobot Magician ke komputer menggunakan Dobot Lab, Anda akan membutuhkan kabel USB dan sumber daya listrik. Pertama, pastikan Anda telah menginstal perangkat lunak Dobot Lab yang dapat diunduh dari situs resmi Dobot. Setelah itu, sambungkan kabel USB dari komputer ke port USB yang tersedia pada kontroler Dobot Magician. Pastikan Dobot Magician dalam keadaan mati sebelum Anda menyambungkannya ke sumber daya listrik menggunakan kabel power. Setelah kabel power terpasang, nyalakan Dobot Magician dengan menekan tombol daya di kontroler. Selanjutnya, buka perangkat lunak Dobot Lab di komputer dan cari opsi untuk menghubungkan dengan Dobot Magician, biasanya melalui menu "Connect" atau "Device". Pilih port koneksi yang sesuai dengan port USB yang Anda gunakan. Setelah terhubung, perangkat lunak akan menampilkan status koneksi yang menunjukkan bahwa Dobot Magician berhasil terhubung ke komputer.
 
-**Syntax**:
-```python
-# Parameters:
-# v        - Velocity of the Dobots movements
-# a        - Acceleration of the Dobots movements.
-# isQueued - To queue the command or not.
+### Kalibrasi Robot dengan Kamera
+Untuk mengkalibrasi koordinat kamera dengan koordinat Dobot Magician, diperlukan pembuatan rumus konversi yang memungkinkan transformasi koordinat dari sistem kamera ke sistem robot. Proses kalibrasi ini melibatkan pengumpulan data koordinat pada kedua sistem, analisis data, dan perhitungan matriks transformasi.
 
-# Function:
-dType.SetPTPCommonParams(api, v, a, isQueued)
-```
+Pertama, Anda perlu mengumpulkan data koordinat yang sesuai antara sistem kamera dan sistem robot. Ini dapat dilakukan dengan menggunakan teknik penandaan (marker) atau penginderaan objek tertentu pada kedua sistem. Setidaknya, tiga pasang koordinat yang sesuai harus ditentukan. Misalnya, tiga titik yang jelas terlihat pada objek di dunia nyata dicatat koordinatnya pada sistem kamera dan sistem robot.
 
-**Default Example**:
-```python
-dType.SetPTPCommonParams(api, 100, 100, isQueued = 1)
-```
+Selanjutnya, menggunakan perangkat lunak pemrosesan gambar atau perangkat lunak matematika, Anda dapat melakukan analisis terhadap data yang dikumpulkan. Dalam analisis ini, berbagai metode transformasi seperti transformasi linier atau transformasi perspektif dapat diterapkan. Metode transformasi ini akan menghasilkan matriks transformasi yang menghubungkan koordinat kamera dengan koordinat robot.
 
-___
+Setelah matriks transformasi diperoleh, rumus konversi dapat dibuat. Rumus ini akan menerapkan transformasi pada koordinat kamera untuk menghasilkan koordinat robot. Biasanya, rumus konversi melibatkan perkalian matriks dan penambahan vektor.
 
-The home parameter specifies where the default stance of the Dobot Magician. Calling the home function then returns to this position. The arguments specifies the X and Y coordinates of the home location. Z is the height of the arm at this location and R is the rotation of the peripheral to return to. You can play around with the coordinates to find where you want the position to be. To return to the home position, use ```dType.SetHomeCmd()```. If the home function is called before setting parameters, the dobot will return to the default home location, otherwise it will go to the user specified location.
-
-**Syntax**:
-```python
-# Parameters:
-# x - X coordinate for home position.
-# y - Y coordinate for home position.
-# z - Z coordinate for home position.
-# r - Peripheral rotation at home position.
-
-# Function:
-dType.SetHomeParams(api, x, y, z, r, isQueued)
-```
-```python
-# Parameters:
-# homeCmd - Home command variable pointers
-
-# Function:
-dType.SetHomeCmd(api, homeCmd, isQueued)
-```
-
-**Default Example**:
-```python
-dType.SetHomeParams(api, 250, 0, 50, 0, isQueued = 1)
-```
-```python
-dType.SetHomeCmd(api, homeCmd = 0, isQueued = 1)
-```
-
-___
-
-### Movement Commands
-There are two major ways of moving the Dobot Magicians arm. The first is using X, Y and Z coordinates and the other is based on joint orientation. We will be using X, Y and Z in this guide, but if you want to use the joints please refer to the documentation.
-
-The main way of moving the Dobot to a location is through the function ```dType.SetPTPCmd()```. This function requires X, Y, Z and R coordinates and rotation. We also specify which movement mode to be used in the function and if we want to queue it or not. Keep in mind that the Dobot Magician will lock up if you move the arm to a location which it's unable to reach.
-
-**Syntax**:
-```python
-# Parameters:
-# dType.movementMode - Specifies wanted movement mode.
-# X                  - Requested X coordinate.
-# Y                  - Requested Y coordinate.
-# Z                  - Requested Z coordinate.
-# R                  - PRequested peripheral rotation.
-
-# Function:
-dType.SetPTPCmd(api, dType.movementMode, X, Y, Z, R, isQueued)
-```
-
-**Default Example**
-```python
-dType.SetPTPCmd(api, dType.PTPMode.PTPMOVLXYZMode, X, Y, Z, R, isQueued = 1)
-```
-
-___
-
-After a command is issued, use the ```dType.QueuedCmdStartExec()``` function to start execution explained above. It is important when not using the queue to use the ```dType.dSleep()``` function to allow for commands to fully execute before forcing a new one, otherwise the outcome might not be satisfactory.
-
-
-### Peripherals
-The Dobot Magician has alot of different peripherals in its repository, allowing it to do a bunch of fun things. Thins like using a suction cup to grab items, or grabbing items with a claw and many, many more! To activate the suction cup we use the function ```dType.SetEndEffectorSuctionCup()```.
+### Pick and Place
+Dobot Magician mempunyai fungsi bawaan yang dapat memindahkan posisi lengan dari satu poin ke poin yang lain. Berikut ini fungsi untuk memindahkan posisi lengan.
+```magician.ptp(mode=0, x=endx, y=endy, z=-75, r=0)```.
+Selain itu, Dobot Magician mempunyai fungsi bawaan yang dapat mengaktifkan edn effector suction cup dengan fungsi berikut.
+```magician.set_endeffector_suctioncup(enable=True, on=True)```.
 
 **Syntax**:
 ```python
