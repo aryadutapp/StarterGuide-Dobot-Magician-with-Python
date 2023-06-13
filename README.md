@@ -7,27 +7,27 @@
 
 Dalam hal ini memfokuskan pengoperasian DoBot Magician melalui Python dengan  menggunakan [Dobot Lab](https://www.dobot-robots.com/products/education/magician.html). Menggunakan kode Python memberikan kebebasan yang lebih besar dalam mengontrol DoBot Magician, termasuk otomatisasi dan gerakan yang sangat terkalibrasi untuk tugas yang kompleks. 
 
-## Table of Content
-* [Starting Out](#starting-out)
-* [Important Functions](#important-functions)
-   * [Connect to the Dobot](#connect-to-the-dobot)
-   * [Queue Manipulation](#queue-manipulation)
-   * [Setting Parameters](#setting-parameters)
-   * [Movement Commands](#movement-commands)
-   * [Peripherals](#peripherals)
+## Daftar Isi
+* [Memulai](#Memulai)
+* [Langkah - Langkah](#Langkah - Langkah)
+   * [Pengaturan Kamera](#Pengaturan Kamera)
+   * [Deteksi Objek dengan OpenCV](#Deteksi Objek dengan OpenCV)
+   * [Menghubungkan Robot](#Menghubungkan Robot)
+   * [Kalibrasi Robot dengan Kamera](#Kalibrasi Robot dengan Kamera)
+   * [Pick and Place](#Pick and Place)
 * [Test Program](#test-program)
 * [Conclusion](#conclusion)
 * [Download Links](#download-links)
 
 
-## Starting Out
+## Pengaturan Kamera
 To get started you'll need an IDE which you can use to work with Python. There is no need to use a specific one so go with the IDE that you are the most comfortable with and has support for Python. For the functions created in this guide [Atom](https://atom.io/) was used, but it is not necessary as an IDE like [Visual Studio Code](https://code.visualstudio.com/) or similar would also suffice.
 
 To communicate with the DoBot we need to download the API supplied by DOBOT for the DoBot Magician. The file you are looking for is [DobotDemov2.0](https://www.dobot.cc/downloadcenter/dobot-magician.html?sub_cat=72#sub-download). From this website you're also required to download and install the [Magician Studio](https://www.dobot.cc/downloadcenter/dobot-magician.html). We will not use the application itself, but the installation process contains some dependencies required to communicate with the dobot from our third party application.
 
 You will also need [Python](https://www.python.org/). Python is also available for download through the Microsoft Store.
 
-## Important Functions
+## Deteksi Objek dengan OpenCV
 
 To understand how to use the Dobot more efficiently we have to look into what types of commands you can use to control it. Many of these functions are accessable inside the DoBotControl file, but theres also alot of them inside the DLL file  which is not being used. Here we will briefly go through some of the most important ones to get you started. If you want more indepth information it can be found in the [DoBot Magician API Description](https://www.dobot.cc/downloadcenter.html?sub_cat=72#sub-download).
 
@@ -42,7 +42,7 @@ api = dType.load()
 
 ___
 
-### Connect to the Dobot
+### Menghubungkan Robot
 To connect to the Dobot we use the function *dType.ConnectDobot()*. The arguments in this function are the api object created with the ```dType.load()``` function, the port name for the Dobot and the baudrate. The port name will only affect you if you use multiple Dobots connected to the computer and if you only have one Dobot Magician connected then the port name doesnt have to be specified. More information can be found in the documentation.
 
 **Syntax**:
@@ -72,7 +72,7 @@ dType.DisconnectDobot(api)
 
 ___
 
-### Queue Manipulation
+### Kalibrasi Robot dengan Kamera
 There are functions which manipulates the command queue and functions that issue commands to the Dobot. You can operate the Dobot using the command queue, or just issue them directly. The difference is that the command queue can be filled up with commands and then executed in order, while without it the command will be executed directly after being called. To start off we will go through the mcommand queue manipulation functions.
 
 The function ```dType.SetQueuedCmdStartExec()``` will start executing the commands in the queue one after another in order of inputting them. If no commands are in the queue, nothing will happen.
@@ -108,7 +108,7 @@ ___
 More queue manipulation functions are available in the documentation.
 
 
-### Setting Parameters
+### Pick and Place
 Before we start issuing movement commands we need to set some parameters which specifies the velocity and acceleration of the joints. This is done using the function ```dType.SetPTPCommonParams()```. The function takes some arguments to specify the above. The first argument is the *api* object created with the load function. The second specifies the velocity ratio. The third specifies the acceleration ratio, and the last argument specifies if the function should be queued or not.
 
 **Syntax**:
