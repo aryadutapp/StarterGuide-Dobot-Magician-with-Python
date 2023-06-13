@@ -9,7 +9,7 @@ Dalam hal ini memfokuskan pengoperasian DoBot Magician melalui Python dengan  me
 
 ## Daftar Isi
 * [Memulai](#Memulai)
-* [Langkah - Langkah](#Langkah - Langkah)
+* [Langkah - Langkah](#Langkah-Langkah)
    * [Pengaturan Kamera](#Pengaturan Kamera)
    * [Deteksi Objek dengan OpenCV](#Deteksi Objek dengan OpenCV)
    * [Menghubungkan Robot](#Menghubungkan Robot)
