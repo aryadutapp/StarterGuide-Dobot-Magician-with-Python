@@ -235,19 +235,19 @@ Setelah matriks transformasi diperoleh, rumus konversi dapat dibuat. Rumus ini a
 
 ### Pick and Place
 Dobot Magician mempunyai fungsi bawaan yang dapat memindahkan posisi lengan dari satu poin ke poin yang lain. Berikut ini fungsi untuk memindahkan posisi lengan.
-```magician.ptp(mode=0, x=endx, y=endy, z=-75, r=0)```.
-Selain itu, Dobot Magician mempunyai fungsi bawaan yang dapat mengaktifkan edn effector suction cup dengan fungsi berikut.
-```magician.set_endeffector_suctioncup(enable=True, on=True)```.
 
 **Syntax**:
 ```python
-# Parameters:
-# enableControl - Enables control over the peripheral.
-# suction       - Enables or Disabled the peripheral. 
-
-# Function:
-dType.SetEndEffectorSuctionCup(api, enableControl, suction, isQueued)
+magician.ptp(mode=0, x=endx, y=endy, z=-75, r=0)
 ```
+
+Selain itu, Dobot Magician mempunyai fungsi bawaan yang dapat mengaktifkan edn effector suction cup dengan fungsi berikut.
+**Syntax**:
+```python
+magician.set_endeffector_suctioncup(enable=True, on=True)
+```
+
+
 
 The enableControl argument enables or disables the pump. Suction enables outtake or intake. For more peripheral information, refer to the documentation.
 
