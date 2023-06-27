@@ -31,7 +31,9 @@ Untuk memahami bagaimana alur kerja pick-and-place mari kita bagi menjadi tiga k
 
 ## Pengaturan Kamera
 
-nana memahami bagaimana alur kerja pick-and-place mari kita bagi menjadi tiga kategori berupa persepsi, kognisi, dan aksi. Persepsi merupakan bagaimana robot dapat melihat lingkungan sekitar. Secara default, Dobot Magician tidak memiliki sensor yang mengawasi kondisi eksternal robot. Oleh sebab itu, kita akan menggunakan kamera sebagai masukan citra yang terhubung ke komputer. Kognisi adalah bagaimana robot dapat memahami lingkungan sekitar. Kita melakukan pengolahan citra dengan menggunakan OpenCV dengan Python yang dapat melakukan berbagai operasi pengolahan citra, dalam projek ini berarti bagaimana objek dapat dideteksi berdasarkan klasifikasi warna. Aksi adalah pergerakan yang dilakukan robot setelah memahami lingkungan sekitar, dalam projek ini berarti bagaimana robot dapat bergerak dan mengambil objek.
+Untuk kamera, kami menggunakan sistem kamera global dimana ada kamera diatas dobot yang berfungsi untuk melakukan tracking benda yang akan diambil oleh dobot. Dobot memmpunyai visual kit yang dapat dibeli jika anda tertarik. Namun kami melakukan DIY dengan menggunakan phonr holder di atas meja.
+
+![alt text](dobotlab-sc.png)
 
 ### Deteksi Objek dengan OpenCV
 
