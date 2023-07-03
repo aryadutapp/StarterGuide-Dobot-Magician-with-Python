@@ -35,14 +35,22 @@ Untuk kamera, kami menggunakan sistem kamera global dimana ada kamera diatas dob
 
 ![alt text](dobotlab-sc.png)
 
-Berikut ini kode untuk kalibrasi agar robot bergerak pada titik tertentu, kemudian kita dapat memanfaatkan kode OpenCV untuk mencatat koordinat robot dan koordinat kamera
+Berikut ini kode agar lengan robot bergerak pada titik kalibrasi. Selanjutnya kita letakkan objek referensi untuk kalibrasi dan mulai mencatat koordinat kamera dan robot dan kemudian lakukan analisis regresi di excel untuk mendapatkan rumus x dan y
 
 **Syntax**:
 ```python
-**Syntax**:
-```python
-magician.ptp(mode=0, x=endx, y=endy, z=-75, r=0)
-```
+#kalibrasi
+from DobotEDU import *
+import time
+
+x_move = [104.98, 93.61, 113.31, 200.36, 235.55, 285.53, 305.22, 303.47, 283.66, 233.05, 185.77, 109.29, 83.83, 64.08, 88.85]
+y_move= [292.72, 249.02, 163.24, 217.29, 135.9, 60.74, 14.06, -59.98, -130.51, -166.11, -209.8, -268.17, -284.29, -219.94, -283.83]
+
+for i in range (len(x_move)):
+  magician.ptp(mode=0, x=x_move[i], y=y_move[i], z=-50, r=0)
+  time.sleep(3)
+  magician.ptp(mode=0, x=259, y=0, z=-8, r=0)
+  time.sleep(5)
 ```
 
 ### Deteksi Objek dengan OpenCV
