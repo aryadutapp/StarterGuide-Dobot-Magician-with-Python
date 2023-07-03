@@ -308,11 +308,12 @@ magician.set_endeffector_suctioncup(enable=True, on=True)
 
 **Syntax**:
 ```python
-# version: Python3
 from DobotEDU import *
-
 import numpy as np
 import cv2
+
+x_move =  [104.98, 93.61, 113.31, 200.36, 235.55, 285.53, 305.22, 303.47, 283.66, 233.05, 185.77, 109.29, 83.83, 64.08, 88.85]
+y_move= [292.72, 249.02, 163.24, 217.29, 135.9, 60.74, 14.06, -59.98, -130.51, -166.11, -209.8, -268.17, -284.29, -219.94, -283.83]
 
 # Global variables to store the mouse coordinates and ignore flag
 mouse_x = 0
@@ -321,14 +322,31 @@ ignore_color_detection = False
 
 # Global variables to store the mouse coordinates and ignore flag
 xblu = 0
+xblu2 = 0
 yblu = 0
+yblu2 = 0
 
 xred = 0
+xred2 = 0
 yred = 0
+yred2 = 0
 
 xyel = 0
+xyel2 = 0
 yyel = 0
+yyel2 = 0
 
+def rum_x(x):
+  return 1.912*x - 302.12
+
+def rum_y(y):
+  return -2.2389*y + 556.92
+
+
+# Global variables to store the mouse coordinates and ignore flag
+mouse_x = 0
+mouse_y = 0
+ignore_color_detection = False
 
 # Function to handle mouse events
 def mouse_callback(event, x, y, flags, param):
@@ -341,12 +359,13 @@ def mouse_callback(event, x, y, flags, param):
         ignore_color_detection = not ignore_color_detection  # Toggle the ignore flag
 
 # Capturing video through webcam
-webcam = cv2.VideoCapture("http://10.3.130.130:4747/video")
+webcam = cv2.VideoCapture("http://10.3.135.55:4747/video")
 
 # Initialize last known mouse coordinates
 last_mouse_x = 0
 last_mouse_y = 0
 
+# Start a while loop
 # Start a while loop
 while True:
     # Reading the video from the webcam in image frames
@@ -403,8 +422,12 @@ while True:
                         break
             if not has_inner_object:
                 center = (x + w // 2, y + h // 2)
-                xred = x + w // 2
-                yred = y + h // 2
+                if red_count == 0:
+                    xred = x + w // 2
+                    yred = y + h // 2
+                elif red_count == 1:
+                    xred2 = x + w // 2
+                    yred2 = y + h // 2
                 cv2.circle(imageFrame, center, 5, (0, 0, 255), -1)
                 red_count += 1
                 # Print coordinates on the right side of the frame
@@ -418,7 +441,7 @@ while True:
 
     for pic, contour in enumerate(contours):
         area = cv2.contourArea(contour)
-        if area > 300:
+        if area > 1000:
             x, y, w, h = cv2.boundingRect(contour)
             has_inner_object = False
             for inner_contour in contours:
@@ -436,8 +459,12 @@ while True:
                         break
             if not has_inner_object:
                 center = (x + w // 2, y + h // 2)
-                xyel = x + w // 2
-                yyel = y + h // 2
+                if yellow_count == 0:
+                    xyel = x + w // 2
+                    yyel = y + h // 2
+                elif yellow_count == 1:
+                    xyel2 = x + w // 2
+                    yyel2 = y + h // 2
                 cv2.circle(imageFrame, center, 5, (0, 165, 255), -1)
                 yellow_count += 1
                 # Print coordinates on the right side of the frame
@@ -469,8 +496,12 @@ while True:
                         break
             if not has_inner_object:
                 center = (x + w // 2, y + h // 2)
-                xblu = x + w // 2
-                yblu = y + h // 2
+                if blue_count == 0:
+                    xblu = x + w // 2
+                    yblu = y + h // 2
+                elif blue_count == 1:
+                    xblu2 = x + w // 2
+                    yblu2 = y + h // 2
                 cv2.circle(imageFrame, center, 5, (255, 0, 0), -1)
                 blue_count += 1
                 # Print coordinates on the right side of the frame
@@ -484,58 +515,56 @@ while True:
     cv2.imshow("Color Detection", imageFrame)
 
     # Check if 'q' is pressed on the keyboard
-    if cv2.waitKey(1) & 0xFF == ord("q"):
+    if cv2.waitKey(1) & 0xFF == ord("a"):
         break
 
 # Release the webcam and close all windows
 webcam.release()
 cv2.destroyAllWindows()
 
-endx = 2.187 * xblu - 133.34
-endy = -2.2508 * yblu + 523.72
+if (xblu != 0 and yblu != 0) or (xblu2 != 0 and yblu2 != 0) or (xyel != 0 and yyel != 0) or (xyel2 != 0 and yyel2 != 0) or (xred != 0 and yred != 0) or (xred2 != 0 and yred2 != 0):
+    if xblu != 0 and yblu != 0:
+      
+        magician.ptp(mode=0, x=rum_x(xblu), y=rum_y(yblu), z=-75, r=0)
+        magician.set_endeffector_suctioncup(enable=True, on=True)
 
-print(xblu)
-print(yblu)
-print(endx)
-print(endy)
+        magician.ptp(mode=0, x=32.87, y=219.8, z=-8.49, r=0)
+        magician.set_endeffector_suctioncup(enable=True, on=False)
 
+    if xblu2 != 0 and yblu2 != 0:
+        magician.ptp(mode=0,x=rum_x(xblu2), y=rum_y(yblu2), z=-75, r=0)
+        magician.set_endeffector_suctioncup(enable=True, on=True)
 
-magician.ptp(mode=0, x=endx, y=endy, z=-67, r=0)
-magician.set_endeffector_suctioncup(enable=True, on=True)
+        magician.ptp(mode=0, x=32.87, y=219.8, z=-8.49, r=0)
+        magician.set_endeffector_suctioncup(enable=True, on=False)
 
-magician.ptp(mode=0, x=259.23, y=0, z=-8.49, r=0)
-magician.set_endeffector_suctioncup(enable=True, on=False)
+    if xyel != 0 and yyel != 0:
+        magician.ptp(mode=0, x=rum_x(xyel), y=rum_y(yyel), z=-75, r=0)
+        magician.set_endeffector_suctioncup(enable=True, on=True)
 
+        magician.ptp(mode=0, x=45.87, y=298.25, z=-8.49, r=0)
+        magician.set_endeffector_suctioncup(enable=True, on=False)
 
-endx = 2.187 * xyel - 133.34
-endy = -2.2508 * yyel + 523.72
+    if xyel2 != 0 and yyel2 != 0:
+        magician.ptp(mode=0, x=rum_x(xyel2), y=rum_y(yyel2), z=-75, r=0)
+        magician.set_endeffector_suctioncup(enable=True, on=True)
 
-print(xyel)
-print(yyel)
-print(endx)
-print(endy)
+        magician.ptp(mode=0, x=45.87, y=298.25, z=-8.49, r=0)
+        magician.set_endeffector_suctioncup(enable=True, on=False)
 
+    if xred != 0 and yred != 0:
+        magician.ptp(mode=0, x=rum_x(xred), y=rum_y(yred), z=-75, r=0)
+        magician.set_endeffector_suctioncup(enable=True, on=True)
 
-magician.ptp(mode=0, x=endx, y=endy, z=-78, r=0)
-magician.set_endeffector_suctioncup(enable=True, on=True)
+        magician.ptp(mode=0, x=-56.14, y=-216.66, z=-8.49, r=0)
+        magician.set_endeffector_suctioncup(enable=True, on=False)
 
-magician.ptp(mode=0, x=259.23, y=0, z=-8.49, r=0)
-magician.set_endeffector_suctioncup(enable=True, on=False)
+    if xred2 != 0 and yred2 != 0:
+        magician.ptp(mode=0, x=rum_x(xred2), y=rum_y(yred2), z=-75, r=0)
+        magician.set_endeffector_suctioncup(enable=True, on=True)
 
-endx = 2.187 * xred - 133.34
-endy = -2.2508 * yred + 523.72
-
-print(xyel)
-print(yyel)
-print(endx)
-print(endy)
-
-
-magician.ptp(mode=0, x=endx, y=endy, z=-75, r=0)
-magician.set_endeffector_suctioncup(enable=True, on=True)
-
-magician.ptp(mode=0, x=259.23, y=0, z=-8.49, r=0)
-magician.set_endeffector_suctioncup(enable=True, on=False)
+        magician.ptp(mode=0, x=-56.14, y=-216.66, z=-8.49, r=0)
+        magician.set_endeffector_suctioncup(enable=True, on=False)
 ```
 
 ___
