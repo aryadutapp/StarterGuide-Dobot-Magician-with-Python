@@ -62,19 +62,40 @@ OpenCV berisi metode yang dapat menerima berkas konfigurasi/bobot deteksi objek 
 import numpy as np
 import cv2
 
+x_move =  [104.98, 93.61, 113.31, 200.36, 235.55, 285.53, 305.22, 303.47, 283.66, 233.05, 185.77, 109.29, 83.83, 64.08, 88.85]
+y_move= [292.72, 249.02, 163.24, 217.29, 135.9, 60.74, 14.06, -59.98, -130.51, -166.11, -209.8, -268.17, -284.29, -219.94, -283.83]
+
 # Global variables to store the mouse coordinates and ignore flag
 mouse_x = 0
 mouse_y = 0
 ignore_color_detection = False
 
-# Global variables to store the object coordinates (blue,red,yellow)
+# Global variables to store the mouse coordinates and ignore flag
 xblu = 0
+xblu2 = 0
 yblu = 0
-xred = 0
-yred = 0
-xyel = 0
-yyel = 0
+yblu2 = 0
 
+xred = 0
+xred2 = 0
+yred = 0
+yred2 = 0
+
+xyel = 0
+xyel2 = 0
+yyel = 0
+yyel2 = 0
+
+def rum_x(x):
+  return 2.1738*x - 110.47
+
+def rum_y(y):
+  return -2.208*y + 550.7
+
+# Global variables to store the mouse coordinates and ignore flag
+mouse_x = 0
+mouse_y = 0
+ignore_color_detection = False
 
 # Function to handle mouse events
 def mouse_callback(event, x, y, flags, param):
@@ -87,12 +108,13 @@ def mouse_callback(event, x, y, flags, param):
         ignore_color_detection = not ignore_color_detection  # Toggle the ignore flag
 
 # Capturing video through webcam
-webcam = cv2.VideoCapture("http://10.3.130.130:4747/video")
+webcam = cv2.VideoCapture("http://10.3.135.55:4747/video")
 
 # Initialize last known mouse coordinates
 last_mouse_x = 0
 last_mouse_y = 0
 
+# Start a while loop
 # Start a while loop
 while True:
     # Reading the video from the webcam in image frames
@@ -149,8 +171,12 @@ while True:
                         break
             if not has_inner_object:
                 center = (x + w // 2, y + h // 2)
-                xred = x + w // 2
-                yred = y + h // 2
+                if red_count == 0:
+                    xred = x + w // 2
+                    yred = y + h // 2
+                elif red_count == 1:
+                    xred2 = x + w // 2
+                    yred2 = y + h // 2
                 cv2.circle(imageFrame, center, 5, (0, 0, 255), -1)
                 red_count += 1
                 # Print coordinates on the right side of the frame
@@ -164,7 +190,7 @@ while True:
 
     for pic, contour in enumerate(contours):
         area = cv2.contourArea(contour)
-        if area > 300:
+        if area > 1000:
             x, y, w, h = cv2.boundingRect(contour)
             has_inner_object = False
             for inner_contour in contours:
@@ -182,8 +208,12 @@ while True:
                         break
             if not has_inner_object:
                 center = (x + w // 2, y + h // 2)
-                xyel = x + w // 2
-                yyel = y + h // 2
+                if yellow_count == 0:
+                    xyel = x + w // 2
+                    yyel = y + h // 2
+                elif yellow_count == 1:
+                    xyel2 = x + w // 2
+                    yyel2 = y + h // 2
                 cv2.circle(imageFrame, center, 5, (0, 165, 255), -1)
                 yellow_count += 1
                 # Print coordinates on the right side of the frame
@@ -215,8 +245,12 @@ while True:
                         break
             if not has_inner_object:
                 center = (x + w // 2, y + h // 2)
-                xblu = x + w // 2
-                yblu = y + h // 2
+                if blue_count == 0:
+                    xblu = x + w // 2
+                    yblu = y + h // 2
+                elif blue_count == 1:
+                    xblu2 = x + w // 2
+                    yblu2 = y + h // 2
                 cv2.circle(imageFrame, center, 5, (255, 0, 0), -1)
                 blue_count += 1
                 # Print coordinates on the right side of the frame
