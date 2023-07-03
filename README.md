@@ -35,6 +35,16 @@ Untuk kamera, kami menggunakan sistem kamera global dimana ada kamera diatas dob
 
 ![alt text](dobotlab-sc.png)
 
+Berikut ini kode untuk kalibrasi agar robot bergerak pada titik tertentu, kemudian kita dapat memanfaatkan kode OpenCV untuk mencatat koordinat robot dan koordinat kamera
+
+**Syntax**:
+```python
+**Syntax**:
+```python
+magician.ptp(mode=0, x=endx, y=endy, z=-75, r=0)
+```
+```
+
 ### Deteksi Objek dengan OpenCV
 
 OpenCV berisi metode yang dapat menerima berkas konfigurasi/bobot deteksi objek untuk berbagai model deteksi objek yang berbeda. OpenCV dapat menghasilkan ambang batas kepercayaan (confidence threshold) dan koordinat kotak pembatas (bounding box). Hal ini sangat berguna karena OpenCV memiliki metode yang dapat menerima koordinat kotak pembatas untuk dengan cepat menampilkan kotak di sekitar objek yang terdeteksi dan memberi label pada objek yang terdeteksi dengan sedikit kode yang sederhana dan bersih.
